@@ -56,17 +56,37 @@ app.post('/analyze-image', async (req, res) => {
       Output strictly the RAW JSON dictionary object.
     `;
 
-    // Initialize the model
-    const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        generationConfig: { responseMimeType: "application/json" }
-    });
+    // Try multiple models to ensure it works regardless of the user's API key region/age
+    const modelsToTry = [
+        { name: "gemini-1.5-flash-latest", config: { responseMimeType: "application/json" } },
+        { name: "gemini-1.5-pro-latest", config: { responseMimeType: "application/json" } },
+        { name: "gemini-pro-vision", config: {} } // Legacy fallback
+    ];
 
-    // Call Gemini
-    const result = await model.generateContent([
-        prompt, 
-        { inlineData: { data: base64Data, mimeType: mimeType } }
-    ]);
+    let result;
+    let fallbackError;
+
+    for (const modelDef of modelsToTry) {
+        try {
+            console.log("Trying model: " + modelDef.name);
+            const model = genAI.getGenerativeModel({ 
+                model: modelDef.name, 
+                generationConfig: modelDef.config 
+            });
+            result = await model.generateContent([
+                prompt, 
+                { inlineData: { data: base64Data, mimeType: mimeType } }
+            ]);
+            break; // Success! Break out of the loop.
+        } catch (err) {
+            console.warn("Model " + modelDef.name + " failed:", err.message);
+            fallbackError = err; // Save error and try the next one
+        }
+    }
+
+    if (!result) {
+        throw new Error("All Gemini models failed. Last error: " + (fallbackError ? fallbackError.message : "Unknown error"));
+    }
 
     const aiText = result.response.text();
     console.log("Raw Gemini Output:", aiText);
