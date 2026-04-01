@@ -30,10 +30,16 @@ app.post('/analyze-image', async (req, res) => {
       return res.status(400).json({ error: 'Missing imageBase64 string' });
     }
 
+    let mimeType = 'image/jpeg';
+    const mimeMatch = imageBase64.match(/^data:(image\/\w+);base64,/);
+    if (mimeMatch) {
+        mimeType = mimeMatch[1];
+    }
+
     // Process the base64 string
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
 
-    console.log("Image received, querying Gemini...");
+    console.log("Image received, querying Gemini for " + mimeType + "...");
 
     const prompt = `
       You are an expert e-commerce catalog assistant for Meesho. 
@@ -59,7 +65,7 @@ app.post('/analyze-image', async (req, res) => {
     // Call Gemini
     const result = await model.generateContent([
         prompt, 
-        { inlineData: { data: base64Data, mimeType: "image/jpeg" } }
+        { inlineData: { data: base64Data, mimeType: mimeType } }
     ]);
 
     const aiText = result.response.text();
