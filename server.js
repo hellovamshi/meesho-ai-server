@@ -58,9 +58,9 @@ app.post('/analyze-image', async (req, res) => {
 
     // Try multiple models to ensure it works regardless of the user's API key region/age
     const modelsToTry = [
-        { name: "gemini-1.5-flash-latest", config: { responseMimeType: "application/json" } },
-        { name: "gemini-1.5-pro-latest", config: { responseMimeType: "application/json" } },
-        { name: "gemini-pro-vision", config: {} } // Legacy fallback
+        { name: "gemini-2.5-flash", config: { responseMimeType: "application/json" } },
+        { name: "gemini-2.0-flash", config: { responseMimeType: "application/json" } },
+        { name: "gemini-1.5-flash", config: { responseMimeType: "application/json" } }
     ];
 
     let result;
