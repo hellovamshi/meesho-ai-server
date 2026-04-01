@@ -43,17 +43,31 @@ app.post('/analyze-image', async (req, res) => {
 
     const prompt = `
       You are an expert e-commerce catalog assistant for Meesho. 
-      Analyze the provided product image and generate a list of optimal fields for an online listing.
-      You MUST return your response as a pure, valid JSON object. Do NOT wrap it in markdown blockquotes like \`\`\`json.
+      Analyze the provided product image and generate a comprehensive list of optimal fields for an online listing.
+      You MUST return your response as a pure, valid structured JSON object. 
+      Do NOT wrap it in markdown blockquotes like \`\`\`json.
       
-      Required fields in the JSON output:
-      - "TITLE": A catchy, SEO-friendly product native title (up to 60 chars)
-      - "DESCRIPTION": A detailed description highlighting features
-      - "PRICE": An estimated reasonable price for this product in INR (numbers only, e.g. 299)
-      - "CATEGORY": Best matching category (e.g. "Kurtis", "Kitchen Tools")
-      - "BRAND": Detect brand if visible or leave as "Generic"
+      Required fields to guess/generate in the JSON dictionary (return as many as logically applicable):
+      - "Product Name": A catchy, SEO-friendly product native title (up to 60 chars)
+      - "Description": A detailed description highlighting features with bullet points
+      - "Price": Estimated reasonable price in INR (numbers only)
+      - "Category": Best matching category
+      - "Brand": Detect brand if visible or leave as "Generic"
+      - "Color": Primary color of the product (e.g. "Red", "Black", "Multicolor")
+      - "Material": The main material (e.g., "Cotton", "Plastic", "Metal")
+      - "Fabric": If clothing, what fabric?
+      - "Pattern": (e.g., "Solid", "Printed", "Striped")
+      - "Fit_Shape": (e.g., "Regular", "Slim")
+      - "Sleeve Length": (e.g., "Long Sleeves", "Short Sleeves")
+      - "Neck": (e.g., "Round Neck", "V-Neck")
+      - "Occasion": (e.g., "Casual", "Party", "Formal")
+      - "Net Quantity": Usually "1"
+      - "Multipack": Usually "1"
+      - "Generic Name": A simple generic name for the item (e.g., "Wiper", "Shirt", "Pan")
+      - "Care Instructions": Standard care rules
+      - "Country of Origin": Default to "India"
       
-      Output strictly the RAW JSON dictionary object.
+      Output strictly the RAW JSON dictionary object with direct key-value string pairs.
     `;
 
     // Try multiple models to ensure it works regardless of the user's API key region/age
