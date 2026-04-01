@@ -53,19 +53,16 @@ app.post('/analyze-image', async (req, res) => {
       - "Price": Estimated reasonable price in INR (numbers only)
       - "Category": Best matching category
       - "Brand": Detect brand if visible or leave as "Generic"
-      - "Color": Primary color of the product (e.g. "Red", "Black", "Multicolor")
-      - "Material": The main material (e.g., "Cotton", "Plastic", "Metal")
+      - "Color": Primary color of the product
+      - "Material": The main material
       - "Fabric": If clothing, what fabric?
-      - "Pattern": (e.g., "Solid", "Printed", "Striped")
-      - "Fit_Shape": (e.g., "Regular", "Slim")
-      - "Sleeve Length": (e.g., "Long Sleeves", "Short Sleeves")
-      - "Neck": (e.g., "Round Neck", "V-Neck")
-      - "Occasion": (e.g., "Casual", "Party", "Formal")
-      - "Net Quantity": Usually "1"
-      - "Multipack": Usually "1"
-      - "Generic Name": A simple generic name for the item (e.g., "Wiper", "Shirt", "Pan")
-      - "Care Instructions": Standard care rules
-      - "Country of Origin": Default to "India"
+      - "Pattern": Pattern style
+      - "Net Weight (gms)": Estimate weight in grams (e.g. "200", "500")
+      - "Size": E.g., "Free Size", "M", "L"
+      - "GST": Estimate GST bracket (e.g., "5", "12", "18")
+      - "HSN Code": Estimate 4-digit or 8-digit HSN code
+      - "Product ID": Create a random 6 character alphanumeric Style code
+      - "Generic Name": Simple generic name
       
       Output strictly the RAW JSON dictionary object with direct key-value string pairs.
     `;
