@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Load environment variables
 dotenv.config();
@@ -15,8 +15,7 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
 // Setup Gemini Client
-// This automatically picks up GEMINI_API_KEY from environment
-const ai = new GoogleGenAI({});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Health check endpoint for Railway
 app.get('/', (req, res) => {
@@ -31,7 +30,7 @@ app.post('/analyze-image', async (req, res) => {
       return res.status(400).json({ error: 'Missing imageBase64 string' });
     }
 
-    // Process the base64 string (remove data:image/jpeg;base64, prefix if exists)
+    // Process the base64 string
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
 
     console.log("Image received, querying Gemini...");
@@ -51,29 +50,19 @@ app.post('/analyze-image', async (req, res) => {
       Output strictly the RAW JSON dictionary object.
     `;
 
-    // Call Gemini 2.5 Flash
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            { text: prompt },
-            {
-              inlineData: {
-                data: base64Data,
-                mimeType: 'image/jpeg' // Let's default to jpeg, it handles most base64 
-              }
-            }
-          ]
-        }
-      ],
-      config: {
-        responseMimeType: "application/json"
-      }
+    // Initialize the model
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        generationConfig: { responseMimeType: "application/json" }
     });
 
-    const aiText = response.text;
+    // Call Gemini
+    const result = await model.generateContent([
+        prompt, 
+        { inlineData: { data: base64Data, mimeType: "image/jpeg" } }
+    ]);
+
+    const aiText = result.response.text();
     console.log("Raw Gemini Output:", aiText);
     
     // Attempt to parse JSON safely
